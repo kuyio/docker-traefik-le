@@ -1,0 +1,33 @@
+version: "2.1"
+
+services:
+  app:
+    image: app:latest
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    networks:
+      - containers
+    expose:
+      - "9000"
+    labels:
+      - "traefik.docker.network=containers"
+      - "traefik.enable=true"
+      - "traefik.app.frontend.rule=Host:app.DOMAIN"
+      - "traefik.app.port=9000"
+      - "traefik.app.protocol=https"
+
+  db:
+    image: mysql:5.7
+    restart: always
+
+  redis:
+    image: redis:4-alpine
+    restart: always
+
+networks:
+  containers:
+    external: true
